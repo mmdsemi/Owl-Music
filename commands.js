@@ -13,6 +13,8 @@ module.exports = async (cli, msg, args, cmd) => {
         msg.reply(`Your Ping : ${cli.ws.ping}`);
     }
     if (cmd === "play") {
+        if (!msg.member?.voice?.channelId)
+            return msg.reply("Please join a voice channel");
         let query = args.join(" ");
         if (!query) return msg.reply("Please Give Me A Link Or Name :)");
         let queue = player.createQueue(msg.guild.id, {

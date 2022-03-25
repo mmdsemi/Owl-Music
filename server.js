@@ -14,15 +14,11 @@ const symbol = "-";
 const player = new Player(cli);
 
 cli.on("messageCreate", (msg) => {
-    if (msg.content.startsWith(symbol)) {
-        let chnnlId = msg.member.voice.channelId;
-        if (chnnlId) {
-            let args = msg.content.slice(symbol.length).trim().split(/ +/);
-            let cmd = args.shift().toLocaleLowerCase();
-            const commands = require("./commands");
-            commands(cli, msg, args, cmd);
-        }
-    }
+    if (!msg.content.startsWith(symbol)) return;
+    let args = msg.content.slice(symbol.length).trim().split(/ +/);
+    let cmd = args.shift().toLocaleLowerCase();
+    const commands = require("./commands");
+    commands(cli, msg, args, cmd);
 });
 
 cli.login(token);
