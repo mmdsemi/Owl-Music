@@ -1,4 +1,4 @@
-const { Client, Message } = require("discord.js");
+const { Client, Message, Intents } = require("discord.js");
 const { player } = require("./server");
 
 /**
@@ -9,38 +9,36 @@ const { player } = require("./server");
  */
 
 module.exports = async (cli, msg, args, cmd) => {
-    if (cmd === "ping") {
-        msg.reply(`Your Ping : ${cli.ws.ping}`);
+  if (cmd === "ping") {
+    msg.reply(`Your Ping : ${cli.ws.ping}`);
+  }
+  if (cmd === "play") {
+    if (!msg.member?.voice?.channelId)
+      return msg.reply("Please join a voice channel");
+    let query = args.join(" ");
+    if (!query) return msg.reply("Please Give Me A Link Or Name :)");
+    let queue = player.createQueue(msg.guild.id, {
+      metadata: {
+        channel: msg.channel,
+      },
+    });
+
+    try {
+      if (!queue.connection) await queue.connect(msg.member.voice.channel);
+    } catch {
+      queue.destroy();
+      return await msg.reply({
+        content: "Could not join your voice channel!",
+        ephemeral: true,
+      });
     }
-    if (cmd === "play") {
-        if (!msg.member?.voice?.channelId)
-            return msg.reply("Please join a voice channel");
-        let query = args.join(" ");
-        if (!query) return msg.reply("Please Give Me A Link Or Name :)");
-        let queue = player.createQueue(msg.guild.id, {
-            metadata: {
-                channel: msg.channel,
-            },
-        });
 
-        try {
-            if (!queue.connection)
-                await queue.connect(msg.member.voice.channel);
-        } catch {
-            queue.destroy();
-            return await msg.reply({
-                content: "Could not join your voice channel!",
-                ephemeral: true,
-            });
-        }
-
-        const track = await player
-            .search(query, {
-                requestedBy: msg.author,
-            })
-            .then((x) => x.tracks[0]);
-        console.log(track);
-
-        queue.play(track);
-    }
+    const track = await player
+      .search(query, {
+        requestedBy: msg.author,
+      })
+      .then((x) => x.tracks[0]);
+ 
+    queue.play(track);
+  }
 };
