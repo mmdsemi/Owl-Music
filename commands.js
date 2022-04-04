@@ -19,6 +19,7 @@ module.exports = async (cli, msg, args, cmd) => {
     if (!query) return msg.reply("Please Give Me A Link Or Name :)");
     let queue = player.createQueue(msg.guild.id, {
       metadata: {
+        msgs : msg,
         channel: msg.channel,
       },
     });
@@ -38,7 +39,26 @@ module.exports = async (cli, msg, args, cmd) => {
         requestedBy: msg.author,
       })
       .then((x) => x.tracks[0]);
- 
+
+        if(!track) return msg.reply("Oops..! I Cant Find Your Music :(")
+
     queue.play(track);
+    msg.reply({ content: `⏱️ | Loading track **${track.title}**!` });
   }
+  if(cmd === "skip"){
+    let queue = player.getQueue(msg.guild.id)
+    queue.skip()
+  }
+
+  if(cmd === "stop"){
+    let queue = player.getQueue(msg.guild.id);
+    queue.stop()
+    return msg.reply("Song Stoped..!")
+  }
+
+  if(cmd === "resume"){
+    let queue = player.getQueue(msg.guild.id);
+    queue.setPaused(false);
+  }
+
 };
